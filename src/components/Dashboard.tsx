@@ -3,14 +3,13 @@ import { useDashboard, type Category, type LinkItem } from '../store/DashboardCo
 import { DynamicIcon } from './DynamicIcon';
 import { EditModal } from './EditModal';
 import { useTranslation } from '../hooks/useTranslation';
-import { Reorder, useDragControls } from 'framer-motion';
 import { Plus, GripVertical, Trash2, Edit2, Link as LinkIcon, Star } from 'lucide-react';
 import clsx from 'clsx';
 
 const LinkCardItem = ({ item, categoryId, isFavoriteSection = false }: { item: LinkItem, categoryId: string, isFavoriteSection?: boolean }) => {
   const { isEditMode, updateLink, deleteLink, toggleFavorite, config } = useDashboard();
   const [isEditing, setIsEditing] = useState(false);
-  const controls = useDragControls();
+  // const controls = useDragControls(); // Unused now
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(true);
 
@@ -44,7 +43,7 @@ const LinkCardItem = ({ item, categoryId, isFavoriteSection = false }: { item: L
           <div className="absolute top-2 right-2 flex gap-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 dark:bg-gray-800/80 rounded-lg p-1">
             <button onClick={() => setIsEditing(true)} className="p-1 text-blue-500 hover:bg-blue-100 rounded"><Edit2 size={16} /></button>
             <button onClick={() => { if(confirm(t('confirmDelete'))) deleteLink(categoryId, item.id); }} className="p-1 text-red-500 hover:bg-red-100 rounded"><Trash2 size={16} /></button>
-            <div onPointerDown={(e) => controls.start(e)} className="p-1 text-gray-400 cursor-grab touch-none"><GripVertical size={16} /></div>
+            <div className="p-1 text-gray-400 cursor-grab touch-none"><GripVertical size={16} /></div>
           </div>
          )
        )}
@@ -103,14 +102,10 @@ const LinkCardItem = ({ item, categoryId, isFavoriteSection = false }: { item: L
 
   return (
     <>
-      <Reorder.Item
-        value={item}
-        dragListener={isEditMode}
-        dragControls={controls}
-        className="relative group h-full"
-      >
+      {/* Reorder.Item removed, using div instead */}
+      <div className="relative group h-full">
         {CardContent}
-      </Reorder.Item>
+      </div>
       {EditModalComponent}
     </>
   );
@@ -120,7 +115,7 @@ const CategorySection = ({ category }: { category: Category }) => {
   const { isEditMode, updateCategory, deleteCategory, reorderLinks, addLink } = useDashboard();
   const [isEditing, setIsEditing] = useState(false);
   const [isAddingLink, setIsAddingLink] = useState(false);
-  const controls = useDragControls();
+  // const controls = useDragControls(); // Unused now
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(true);
 
@@ -173,16 +168,12 @@ const CategorySection = ({ category }: { category: Category }) => {
 
   return (
     <>
-      <Reorder.Item 
-        value={category} 
-        dragListener={isEditMode}
-        dragControls={controls}
-        className="mb-8 relative"
-      >
+      {/* Reorder.Item removed */}
+      <div className="mb-8 relative">
         <div className="flex items-center justify-between mb-4 px-1 group">
             <div className="flex items-center gap-2">
                 {isEditMode && (
-                    <div onPointerDown={(e) => controls.start(e)} className="cursor-grab touch-none text-gray-400 hover:text-gray-600">
+                    <div className="cursor-grab touch-none text-gray-400 hover:text-gray-600">
                         <GripVertical size={20} />
                     </div>
                 )}
@@ -208,7 +199,7 @@ const CategorySection = ({ category }: { category: Category }) => {
             onDrop={handleDrop}
             tabIndex={isEditMode ? 0 : -1}
         >
-            <Reorder.Group axis="y" values={category.items} onReorder={(newItems) => reorderLinks(category.id, newItems)} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {category.items.map((item) => (
                     <LinkCardItem key={item.id} item={item} categoryId={category.id} />
                 ))}
@@ -223,13 +214,13 @@ const CategorySection = ({ category }: { category: Category }) => {
                         <span className="text-xs mt-1 text-gray-400">{t('dropUrl')}</span>
                      </button>
                 )}
-            </Reorder.Group>
+            </div>
             
             {category.items.length === 0 && !isEditMode && (
                 <p className="text-gray-500 italic text-sm">No items yet.</p>
             )}
         </div>
-      </Reorder.Item>
+      </div>
 
       {isEditing && (
         <EditModal
@@ -306,11 +297,11 @@ export const Dashboard = () => {
   // View: Home
   return (
     <div className="w-full">
-      <Reorder.Group axis="y" values={config.categories} onReorder={reorderCategories}>
+      <div className="flex flex-col">
         {config.categories.map((category) => (
           <CategorySection key={category.id} category={category} />
         ))}
-      </Reorder.Group>
+      </div>
 
       {isEditMode && (
         <button
