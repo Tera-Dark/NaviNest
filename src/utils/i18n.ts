@@ -1,0 +1,109 @@
+
+export const translations = {
+  en: {
+    settings: "Settings",
+    general: "General",
+    aiAssistant: "AI Assistant",
+    language: "Language",
+    theme: "Theme",
+    exportConfig: "Export Config",
+    resetConfig: "Reset Config",
+    save: "Save",
+    cancel: "Cancel",
+    editMode: "Edit Mode",
+    addCategory: "Add Category",
+    addLink: "Add Link",
+    editCategory: "Edit Category",
+    editLink: "Edit Link",
+    delete: "Delete",
+    confirmDelete: "Are you sure you want to delete this?",
+    name: "Name",
+    url: "URL",
+    icon: "Icon",
+    description: "Description",
+    searchPlaceholder: "Search links...",
+    noResults: "No links found matching your search.",
+    welcome: "Welcome to NaviNest",
+    welcomeMessage: "It looks like your configuration is empty. Please add your first category.",
+    dropUrl: "Drop URL here to add",
+    pasteUrl: "Paste URL to add",
+    apiKey: "API Key",
+    baseUrl: "Base URL",
+    system: "System",
+    light: "Light",
+    dark: "Dark",
+    copied: "Copied!",
+    copy: "Copy",
+    jsonConfig: "JSON Configuration",
+    jsonConfigHelp: "You can copy this configuration to your src/data/config.json file to make changes permanent.",
+    close: "Close",
+    defaultIcon: "Default Icon",
+    chooseIcon: "Choose Icon",
+    aiGreeting: "Hello! How can I help you today?",
+    aiError: "Error: Please check your API Key and Base URL.",
+    aiApiKeyMissing: "Please set your API Key in the settings (gear icon) first.",
+    saveAndReturn: "Save & Return",
+    typeMessage: "Type a message...",
+  },
+  zh: {
+    settings: "设置",
+    general: "常规",
+    aiAssistant: "AI 助手",
+    language: "语言",
+    theme: "主题",
+    exportConfig: "导出配置",
+    resetConfig: "重置配置",
+    save: "保存",
+    cancel: "取消",
+    editMode: "编辑模式",
+    addCategory: "添加分类",
+    addLink: "添加链接",
+    editCategory: "编辑分类",
+    editLink: "编辑链接",
+    delete: "删除",
+    confirmDelete: "确定要删除吗？",
+    name: "名称",
+    url: "链接地址",
+    icon: "图标",
+    description: "描述",
+    searchPlaceholder: "搜索链接...",
+    noResults: "未找到匹配的链接。",
+    welcome: "欢迎使用 NaviNest",
+    welcomeMessage: "您的配置似乎为空。请添加您的第一个分类。",
+    dropUrl: "拖拽链接到此处添加",
+    pasteUrl: "粘贴链接以添加",
+    apiKey: "API 密钥",
+    baseUrl: "基础 URL",
+    system: "跟随系统",
+    light: "亮色",
+    dark: "暗色",
+    copied: "已复制！",
+    copy: "复制",
+    jsonConfig: "JSON 配置",
+    jsonConfigHelp: "您可以复制此配置到 src/data/config.json 文件以永久保存更改。",
+    close: "关闭",
+    defaultIcon: "默认图标",
+    chooseIcon: "选择图标",
+    aiGreeting: "你好！今天有什么可以帮你的吗？",
+    aiError: "错误：请检查您的 API 密钥和基础 URL。",
+    aiApiKeyMissing: "请先在设置（齿轮图标）中设置您的 API 密钥。",
+    saveAndReturn: "保存并返回",
+    typeMessage: "输入消息...",
+  }
+};
+
+export type Language = 'en' | 'zh';
+
+export const getLanguage = (): Language => {
+  if (typeof localStorage !== 'undefined') {
+    return (localStorage.getItem('language') as Language) || 'en';
+  }
+  return 'en';
+};
+
+export const setLanguage = (lang: Language) => {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('language', lang);
+    window.location.reload(); // Simple reload to apply changes globally
+  }
+};
