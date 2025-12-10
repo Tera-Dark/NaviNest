@@ -19,8 +19,19 @@ export interface Category {
 }
 
 export interface Config {
-  siteMeta: any;
+  siteMeta: {
+    title: string;
+    description: string;
+    theme: string;
+    logo: string;
+    about?: {
+      en: string;
+      zh: string;
+    };
+    [key: string]: any;
+  };
   aiConfig: any;
+  favorites?: string[]; // Add favorites array
   categories: Category[];
 }
 
@@ -37,7 +48,11 @@ interface DashboardContextType {
   deleteLink: (categoryId: string, linkId: string) => void;
   reorderCategories: (newCategories: Category[]) => void;
   reorderLinks: (categoryId: string, newLinks: LinkItem[]) => void;
+  toggleFavorite: (linkId: string) => void; // Add toggle action
   resetConfig: () => void;
+  importConfig: (configStr: string, mode: 'merge' | 'overwrite') => boolean;
+  currentView: 'home' | 'favorites';
+  setCurrentView: (view: 'home' | 'favorites') => void;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -59,12 +74,30 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [config, setConfig] = useState<Config>(() => normalizeConfig(initialConfig));
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [currentView, setCurrentView] = useState<'home' | 'favorites'>('home');
 
   useEffect(() => {
     const savedConfig = localStorage.getItem('navinest_config');
     if (savedConfig) {
       try {
-        setConfig(normalizeConfig(JSON.parse(savedConfig)));
+        let parsed = normalizeConfig(JSON.parse(savedConfig));
+        
+        // Auto-migration: Check for new default categories from initialConfig that are missing in saved config
+        // This is a simple heuristic: if a category with the same name doesn't exist, we add it.
+        const existingNames = new Set(parsed.categories.map(c => c.name));
+        const normalizedDefaults = normalizeConfig(initialConfig);
+        
+        const newCategories = normalizedDefaults.categories.filter(c => !existingNames.has(c.name));
+        
+        if (newCategories.length > 0) {
+            console.log("Merging new default categories:", newCategories.map(c => c.name));
+            parsed = {
+                ...parsed,
+                categories: [...parsed.categories, ...newCategories]
+            };
+        }
+
+        setConfig(parsed);
       } catch (e) {
         console.error("Failed to parse saved config", e);
       }
@@ -162,11 +195,80 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }));
   };
 
+  const toggleFavorite = (linkId: string) => {
+    setConfig(prev => {
+        const currentFavorites = prev.favorites || [];
+        const newFavorites = currentFavorites.includes(linkId) 
+            ? currentFavorites.filter(id => id !== linkId)
+            : [...currentFavorites, linkId];
+        return { ...prev, favorites: newFavorites };
+    });
+  };
+
   const resetConfig = () => {
     if (confirm('Are you sure you want to reset configuration to defaults? This cannot be undone.')) {
         const normalized = normalizeConfig(initialConfig);
         setConfig(normalized);
         localStorage.removeItem('navinest_config');
+    }
+  };
+
+  const importConfig = (configStr: string, mode: 'merge' | 'overwrite'): boolean => {
+    try {
+        const parsed = JSON.parse(configStr);
+        
+        // Basic validation
+        if (!parsed.categories || !Array.isArray(parsed.categories)) {
+            alert('Invalid configuration format: Missing categories array');
+            return false;
+        }
+
+        const normalized = normalizeConfig(parsed);
+
+        if (mode === 'overwrite') {
+            setConfig(normalized);
+            return true;
+        }
+
+        if (mode === 'merge') {
+            // Generate new IDs for imported categories and items to avoid collision
+            // Also map old IDs to new IDs to preserve favorites
+            const idMap = new Map<string, string>();
+            
+            const newCategories = normalized.categories.map(cat => {
+                const newCatId = uuidv4();
+                // We don't map category IDs generally, but good practice
+                
+                const newItems = cat.items.map(item => {
+                    const newItemId = uuidv4();
+                    idMap.set(item.id, newItemId);
+                    return { ...item, id: newItemId };
+                });
+
+                return { ...cat, id: newCatId, items: newItems };
+            });
+
+            // Handle favorites
+            let newFavorites: string[] = [];
+            if (normalized.favorites && Array.isArray(normalized.favorites)) {
+                newFavorites = normalized.favorites
+                    .map(oldId => idMap.get(oldId))
+                    .filter((id): id is string => !!id);
+            }
+
+            setConfig(prev => ({
+                ...prev,
+                categories: [...prev.categories, ...newCategories],
+                favorites: [...(prev.favorites || []), ...newFavorites]
+            }));
+            return true;
+        }
+
+        return false;
+    } catch (e) {
+        console.error("Import failed", e);
+        alert('Failed to parse configuration JSON');
+        return false;
     }
   };
 
@@ -186,7 +288,11 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       deleteLink,
       reorderCategories,
       reorderLinks,
-      resetConfig
+      toggleFavorite,
+      resetConfig,
+      importConfig,
+      currentView,
+      setCurrentView
     }}>
       {children}
     </DashboardContext.Provider>

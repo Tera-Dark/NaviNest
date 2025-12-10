@@ -3,7 +3,11 @@
     "title": "NaviNest",
     "description": "My Personal Internet Basecamp",
     "theme": "system",
-    "logo": "/favicon.svg"
+    "logo": "/favicon.svg",
+    "about": {
+      "en": "NaviNest is an open-source, highly customizable personal navigation dashboard. It's not just a bookmark manager, but your personal digital command center. Features bilingual support, drag-and-drop layout, AI assistant, and a beautiful glassmorphism design.",
+      "zh": "NaviNest 是一个开源、高度可定制的个人导航仪表盘。它不仅仅是一个书签管理器，更是您的个人数字指挥中心。支持中英双语、拖拽布局、AI 智能助手，并采用精美的玻璃拟态设计。"
+    }
   },
   "aiConfig": {
     "enabled": true,
@@ -40,6 +44,72 @@
           "url": "https://youtube.com",
           "icon": "Youtube",
           "description": "Video Platform"
+        }
+      ]
+    },
+    {
+      "name": "AI Creative Suite",
+      "icon": "Palette",
+      "items": [
+        {
+          "name": "Artist Generator",
+          "url": "https://artist-generator.vercel.app/",
+          "icon": "Palette",
+          "description": "画师串生成器"
+        },
+        {
+          "name": "Prompt Hub",
+          "url": "https://prompt-hub-pied.vercel.app/",
+          "icon": "Search",
+          "description": "提示词分享平台"
+        },
+        {
+          "name": "Real-CUGAN",
+          "url": "https://real-cugan.animesales.xyz/",
+          "icon": "Image",
+          "description": "图片超分工具"
+        },
+        {
+          "name": "SD Inspector",
+          "url": "https://spell.novelai.dev/",
+          "icon": "FileSearch",
+          "description": "图像元数据解析"
+        },
+        {
+          "name": "Tag Master",
+          "url": "https://tera-dark.github.io/Tag-Master/",
+          "icon": "Tag",
+          "description": "图像打标工具"
+        },
+        {
+          "name": "Civitai",
+          "url": "https://civitai.com/",
+          "icon": "Box",
+          "description": "AI 模型分享社区"
+        },
+        {
+          "name": "SeaArt.ai",
+          "url": "https://www.seaart.ai/",
+          "icon": "Zap",
+          "description": "全能 AI 绘画创作平台"
+        },
+        {
+          "name": "Tensor.art",
+          "url": "https://tensor.art/",
+          "icon": "Cpu",
+          "description": "免费在线运行 SD 模型"
+        },
+        {
+          "name": "PicLumen",
+          "url": "https://www.piclumen.com/",
+          "icon": "Image",
+          "description": "免费 AI 图像生成与编辑"
+        },
+        {
+          "name": "Adobe Firefly",
+          "url": "https://firefly.adobe.com/",
+          "icon": "Flame",
+          "description": "Adobe 创意生成式 AI"
         }
       ]
     }

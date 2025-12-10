@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, X, Settings, Send, Bot, User, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import config from '../data/config.json';
 import { useTranslation } from '../hooks/useTranslation';
@@ -138,15 +137,11 @@ export const AiChatWidget = () => {
 
   return (
     <>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-20 right-4 w-[90vw] sm:w-96 h-[60vh] sm:h-[500px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col z-50 overflow-hidden"
-          >
-            {/* Header */}
+      {isOpen && (
+        <div
+          className="fixed bottom-20 right-4 w-[90vw] sm:w-96 h-[60vh] sm:h-[500px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col z-50 overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
+        >
+          {/* Header */}
             <div className="p-4 bg-indigo-600 flex items-center justify-between text-white shrink-0">
                 <div className="flex items-center gap-2">
                     <Bot size={20} />
@@ -250,18 +245,15 @@ export const AiChatWidget = () => {
                     </form>
                 </>
             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
 
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+      <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 p-4 bg-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all z-40 hover:bg-indigo-700"
+        className="fixed bottom-6 right-6 p-4 bg-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all z-40 hover:bg-indigo-700 hover:scale-105 active:scale-95"
       >
         {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
-      </motion.button>
+      </button>
     </>
   );
 };

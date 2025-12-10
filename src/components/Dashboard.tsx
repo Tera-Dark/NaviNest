@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useDashboard, type Category, type LinkItem } from '../store/DashboardContext';
 import { DynamicIcon } from './DynamicIcon';
 import { EditModal } from './EditModal';
 import { useTranslation } from '../hooks/useTranslation';
 import { Reorder, useDragControls } from 'framer-motion';
-import { Plus, GripVertical, Trash2, Edit2, Link as LinkIcon } from 'lucide-react';
+import { Plus, GripVertical, Trash2, Edit2, Link as LinkIcon, Star } from 'lucide-react';
 import clsx from 'clsx';
 
-const LinkCardItem = ({ item, categoryId }: { item: LinkItem, categoryId: string }) => {
-  const { isEditMode, updateLink, deleteLink } = useDashboard();
+const LinkCardItem = ({ item, categoryId, isFavoriteSection = false }: { item: LinkItem, categoryId: string, isFavoriteSection?: boolean }) => {
+  const { isEditMode, updateLink, deleteLink, toggleFavorite, config } = useDashboard();
   const [isEditing, setIsEditing] = useState(false);
   const controls = useDragControls();
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(true);
+
+  const isFavorite = config.favorites?.includes(item.id);
 
   React.useEffect(() => {
     const handleSearch = (e: any) => {
@@ -30,6 +32,75 @@ const LinkCardItem = ({ item, categoryId }: { item: LinkItem, categoryId: string
 
   if (!isVisible) return null;
 
+  const CardContent = (
+    <div className={clsx(
+      "h-full flex flex-col p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl transition-all duration-200 overflow-hidden",
+      isEditMode && !isFavoriteSection ? "cursor-grab active:cursor-grabbing border-dashed border-indigo-300 dark:border-indigo-700" : "hover:shadow-md hover:-translate-y-0.5"
+    )}>
+       {!isEditMode ? (
+         <a href={item.url} target="_blank" rel="noopener noreferrer" className="absolute inset-0 z-0"></a>
+       ) : (
+         !isFavoriteSection && (
+          <div className="absolute top-2 right-2 flex gap-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 dark:bg-gray-800/80 rounded-lg p-1">
+            <button onClick={() => setIsEditing(true)} className="p-1 text-blue-500 hover:bg-blue-100 rounded"><Edit2 size={16} /></button>
+            <button onClick={() => { if(confirm(t('confirmDelete'))) deleteLink(categoryId, item.id); }} className="p-1 text-red-500 hover:bg-red-100 rounded"><Trash2 size={16} /></button>
+            <div onPointerDown={(e) => controls.start(e)} className="p-1 text-gray-400 cursor-grab touch-none"><GripVertical size={16} /></div>
+          </div>
+         )
+       )}
+
+       {/* Favorite Button */}
+       <div className="absolute top-2 right-2 z-20" style={{ display: isEditMode && !isFavoriteSection ? 'none' : 'block' }}>
+           <button 
+            onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleFavorite(item.id);
+            }}
+            className={clsx(
+                "p-1.5 rounded-full transition-all opacity-0 group-hover:opacity-100",
+                isFavorite ? "opacity-100 text-yellow-400 hover:text-yellow-500 bg-yellow-100/50 dark:bg-yellow-900/30" : "text-gray-400 hover:text-yellow-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+            )}
+           >
+               <Star size={16} fill={isFavorite ? "currentColor" : "none"} />
+           </button>
+       </div>
+
+        <div className="flex items-center gap-3 mb-2 relative z-10 pointer-events-none">
+            <div className="p-2 rounded-lg bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                <DynamicIcon name={item.icon} size={20} />
+            </div>
+            <h3 className="font-semibold text-gray-800 dark:text-gray-100 truncate w-full">
+                {item.name}
+            </h3>
+        </div>
+        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 relative z-10 pointer-events-none">
+            {item.description}
+        </p>
+    </div>
+  );
+
+  const EditModalComponent = isEditing && (
+    <EditModal
+        isOpen={isEditing}
+        onClose={() => setIsEditing(false)}
+        onSave={(data) => updateLink(categoryId, item.id, data)}
+        initialData={item}
+        type="link"
+    />
+  );
+
+  if (isFavoriteSection) {
+    return (
+      <>
+        <div className="relative group h-full">
+            {CardContent}
+        </div>
+        {EditModalComponent}
+      </>
+    );
+  }
+
   return (
     <>
       <Reorder.Item
@@ -38,43 +109,9 @@ const LinkCardItem = ({ item, categoryId }: { item: LinkItem, categoryId: string
         dragControls={controls}
         className="relative group h-full"
       >
-        <div className={clsx(
-          "h-full flex flex-col p-4 bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 dark:border-gray-700/30 rounded-xl transition-all duration-300 overflow-hidden",
-          isEditMode ? "cursor-grab active:cursor-grabbing border-dashed border-indigo-300 dark:border-indigo-700" : "hover:shadow-lg hover:-translate-y-1"
-        )}>
-           {!isEditMode ? (
-             <a href={item.url} target="_blank" rel="noopener noreferrer" className="absolute inset-0 z-0"></a>
-           ) : (
-             <div className="absolute top-2 right-2 flex gap-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 dark:bg-gray-800/80 rounded-lg p-1">
-               <button onClick={() => setIsEditing(true)} className="p-1 text-blue-500 hover:bg-blue-100 rounded"><Edit2 size={16} /></button>
-               <button onClick={() => { if(confirm(t('confirmDelete'))) deleteLink(categoryId, item.id); }} className="p-1 text-red-500 hover:bg-red-100 rounded"><Trash2 size={16} /></button>
-               <div onPointerDown={(e) => controls.start(e)} className="p-1 text-gray-400 cursor-grab touch-none"><GripVertical size={16} /></div>
-             </div>
-           )}
-
-            <div className="flex items-center gap-3 mb-2 relative z-10 pointer-events-none">
-                <div className="p-2 rounded-lg bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
-                    <DynamicIcon name={item.icon} size={20} />
-                </div>
-                <h3 className="font-semibold text-gray-800 dark:text-gray-100 truncate w-full">
-                    {item.name}
-                </h3>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 relative z-10 pointer-events-none">
-                {item.description}
-            </p>
-        </div>
+        {CardContent}
       </Reorder.Item>
-
-      {isEditing && (
-        <EditModal
-            isOpen={isEditing}
-            onClose={() => setIsEditing(false)}
-            onSave={(data) => updateLink(categoryId, item.id, data)}
-            initialData={item}
-            type="link"
-        />
-      )}
+      {EditModalComponent}
     </>
   );
 };
@@ -217,10 +254,56 @@ const CategorySection = ({ category }: { category: Category }) => {
 };
 
 export const Dashboard = () => {
-  const { config, isEditMode, reorderCategories, addCategory } = useDashboard();
+  const { config, isEditMode, reorderCategories, addCategory, currentView } = useDashboard();
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const { t } = useTranslation();
 
+  const favoriteLinks = useMemo(() => {
+    if (!config.favorites || config.favorites.length === 0) return [];
+    
+    const allLinks = config.categories.flatMap(cat => cat.items);
+    return config.favorites
+      .map(favId => allLinks.find(link => link.id === favId))
+      .filter((link): link is LinkItem => !!link);
+  }, [config]);
+
+  // View: Favorites
+  if (currentView === 'favorites') {
+      return (
+        <div className="w-full">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2">
+                <Star className="text-yellow-400" size={28} fill="currentColor" />
+                {t('favorites')}
+            </h2>
+            
+            {favoriteLinks.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {favoriteLinks.map(link => {
+                        const category = config.categories.find(c => c.items.some(i => i.id === link.id));
+                        if (!category) return null;
+                        
+                        return (
+                            <LinkCardItem 
+                                key={`fav-page-${link.id}`} 
+                                item={link} 
+                                categoryId={category.id} 
+                                isFavoriteSection={true} 
+                            />
+                        );
+                    })}
+                </div>
+            ) : (
+                <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                    <Star size={48} className="mb-4 opacity-50" />
+                    <p className="text-lg">{t('noFavorites') || "No favorites yet"}</p>
+                    <p className="text-sm mt-2">Click the star icon on any link to add it here.</p>
+                </div>
+            )}
+        </div>
+      );
+  }
+
+  // View: Home
   return (
     <div className="w-full">
       <Reorder.Group axis="y" values={config.categories} onReorder={reorderCategories}>

@@ -12,7 +12,7 @@ const { name, url, icon, description } = Astro.props;
 ---
 
 <a href={url} target="_blank" rel="noopener noreferrer" 
-   class="link-card group relative flex flex-col p-4 bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 dark:border-gray-700/30 rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+   class="link-card group relative flex flex-col p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden"
    data-name={name.toLowerCase()}
    data-description={description.toLowerCase()}>
   <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>

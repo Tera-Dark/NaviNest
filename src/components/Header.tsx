@@ -14,7 +14,7 @@ export const Header = ({ siteMeta }: { siteMeta: any }) => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/30 dark:bg-gray-900/30 border-b border-white/20 dark:border-gray-800/30 shadow-sm transition-all duration-300">
+      <header className="sticky top-0 z-50 w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-4">
             {/* Logo & Title */}

@@ -44,6 +44,16 @@ export const translations = {
     aiApiKeyMissing: "Please set your API Key in the settings (gear icon) first.",
     saveAndReturn: "Save & Return",
     typeMessage: "Type a message...",
+    favorites: "Favorites",
+    dataManagement: "Data Management",
+    importConfig: "Import Configuration",
+    importHelp: "Paste your configuration JSON here to import.",
+    merge: "Merge",
+    overwrite: "Overwrite",
+    download: "Download",
+    invalidJson: "Invalid JSON",
+    importSuccess: "Import successful!",
+    importFailed: "Import failed.",
   },
   zh: {
     settings: "设置",
@@ -89,6 +99,16 @@ export const translations = {
     aiApiKeyMissing: "请先在设置（齿轮图标）中设置您的 API 密钥。",
     saveAndReturn: "保存并返回",
     typeMessage: "输入消息...",
+    favorites: "我的收藏",
+    dataManagement: "数据管理",
+    importConfig: "导入配置",
+    importHelp: "在此处粘贴您的配置 JSON 以导入。",
+    merge: "合并",
+    overwrite: "覆盖",
+    download: "下载",
+    invalidJson: "无效的 JSON",
+    importSuccess: "导入成功！",
+    importFailed: "导入失败。",
   }
 };
 
